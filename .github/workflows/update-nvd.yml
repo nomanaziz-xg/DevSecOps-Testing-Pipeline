@@ -1,6 +1,7 @@
 name: Update Dependency-Check Cache
 
 on:
+  push:
   schedule:
     - cron: '0 0 * * 0'  # Run at midnight on Sundays
 
