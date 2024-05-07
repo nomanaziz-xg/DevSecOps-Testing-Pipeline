@@ -1,42 +1,42 @@
-# name: Testing DevSecOps Pipeline
+name: Testing DevSecOps Pipeline
 
-# on:
-#   # Trigger analysis when pushing to your main branches, and when creating a pull request.
-#   pull_request:
-#     branches:
-#       - master
+on:
+  # Trigger analysis when pushing to your main branches, and when creating a pull request.
+  pull_request:
+    branches:
+      - master
 
-# jobs:
-#   owasp-scan:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v3
+jobs:
+  owasp-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-#       - name: Setup Java
-#         uses: actions/setup-java@v2
-#         with:
-#           distribution: 'adopt'
-#           java-version: '11'
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
 
-#       - name: Cache NVD data
-#         uses: actions/cache@v4
-#         with:
-#           path: dependency-check/data
-#           key: nvd-cache
+      - name: Cache NVD data
+        uses: actions/cache@v4
+        with:
+          path: dependency-check/data
+          key: nvd-cache
 
-#       - name: Download Dependency-Check CLI
-#         run: |
-#           curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v9.1.0/dependency-check-9.1.0-release.zip
-#           unzip dependency-check.zip
+      - name: Download Dependency-Check CLI
+        run: |
+          curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v9.1.0/dependency-check-9.1.0-release.zip
+          unzip dependency-check.zip
 
-#       - name: Run Dependency-Check scan
-#         run: |
-#           cd dependency-check/bin
-#           ./dependency-check.sh --scan $GITHUB_WORKSPACE --noupdate --nvdApiKey ${{ secrets.NVD_API_KEY }} --out . --format HTML
+      - name: Run Dependency-Check scan
+        run: |
+          cd dependency-check/bin
+          ./dependency-check.sh --scan $GITHUB_WORKSPACE --noupdate --nvdApiKey ${{ secrets.NVD_API_KEY }} --out . --format HTML
 
-#       - name: Upload scan report
-#         uses: actions/upload-artifact@v3
-#         with:
-#           name: dependency-check-report
-#           path: dependency-check/bin/dependency-check-report.html
+      - name: Upload scan report
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: dependency-check/bin/dependency-check-report.html
