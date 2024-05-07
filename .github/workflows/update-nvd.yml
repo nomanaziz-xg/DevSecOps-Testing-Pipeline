@@ -48,7 +48,7 @@ jobs:
       - name: Run Dependency-Check scan for only Updating
         run: |
             cd dependency-check/bin
-            ./dependency-check.sh --nvdApiKey ${{ secrets.NVD_API_KEY }} --updateOnly
+            ./dependency-check.sh --nvdApiKey ${{ secrets.NVD_API_KEY }} --updateonly
 
       # overwrite cache key: delete previous and save current
       - name: Delete Previous Cache

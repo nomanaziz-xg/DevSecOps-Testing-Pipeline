@@ -33,7 +33,7 @@
 #       - name: Run Dependency-Check scan
 #         run: |
 #           cd dependency-check/bin
-#           ./dependency-check.sh --scan $GITHUB_WORKSPACE --nvdApiKey ${{ secrets.NVD_API_KEY }} --out . --format HTML
+#           ./dependency-check.sh --scan $GITHUB_WORKSPACE --noupdate --nvdApiKey ${{ secrets.NVD_API_KEY }} --out . --format HTML
 
 #       - name: Upload scan report
 #         uses: actions/upload-artifact@v3
