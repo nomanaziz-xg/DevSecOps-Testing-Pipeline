@@ -1,0 +1,66 @@
+name: Update Dependency-Check Cache
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Run at midnight on Sundays
+
+permissions:
+  contents: read
+  # require to delete cache
+  # https://docs.github.com/en/rest/actions/cache?apiVersion=2022-11-28#delete-github-actions-caches-for-a-repository-using-a-cache-key
+  actions: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      cache-key: nvd-cache
+    steps:
+      # This job implements overwrite cache using restore + delete + save
+      - name: Checkout
+        uses: actions/checkout@v3 # gh command require repository
+
+      - name: Restore Cache
+        id: cache-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: dependency-check/data
+          key: ${{ env.cache-key }}
+  
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+  
+      - name: Cache NVD data
+        uses: actions/cache@v4
+        with:
+            path: dependency-check/data
+            key: nvd-cache
+
+      - name: Download Dependency-Check CLI
+        run: |
+            curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v9.1.0/dependency-check-9.1.0-release.zip
+            unzip dependency-check.zip
+
+      - name: Run Dependency-Check scan for only Updating
+        run: |
+            cd dependency-check/bin
+            ./dependency-check.sh --nvdApiKey ${{ secrets.NVD_API_KEY }} --updateOnly
+
+      # overwrite cache key: delete previous and save current
+      - name: Delete Previous Cache
+        if: ${{ steps.cache-restore.outputs.cache-hit }}
+        continue-on-error: true
+        run: |
+          gh extension install actions/gh-actions-cache
+          gh actions-cache delete "${{ env.cache-key }}" --confirm
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Save Cache
+        uses: actions/cache/save@v3
+        with:
+          path: dependency-check/data
+          key: ${{ env.cache-key }}
