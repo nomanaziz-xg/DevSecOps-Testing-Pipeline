@@ -27,6 +27,8 @@ jobs:
         with:
           path: dependency-check/data
           key: nvd-cache
+          restore-keys: |
+            nvd-cache
 
       - name: Download Dependency-Check CLI
         run: |
