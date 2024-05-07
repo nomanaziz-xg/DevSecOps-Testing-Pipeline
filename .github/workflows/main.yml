@@ -39,6 +39,8 @@ jobs:
           ./dependency-check.sh --scan $GITHUB_WORKSPACE --noupdate --nvdApiKey ${{ secrets.NVD_API_KEY }} --failOnCVSS 7 --out . --format HTML
 
       - name: Upload scan report
+        # Always generate report
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: dependency-check-report
