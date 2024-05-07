@@ -3,4 +3,5 @@
 ## Features
 
 ### 1. S.C.A Scanning
-- Using [Snyk](https://app.snyk.io/)
+- Using [OWASP Dependency Check](https://github.com/jeremylong/DependencyCheck)
+- Fetched vulnerabilities from NVD

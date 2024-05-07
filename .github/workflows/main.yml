@@ -7,17 +7,30 @@ on:
       - master
 
 jobs:
-  snyk:
+  owasp-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Build a Docker image
-        run: docker build -t xgrid/test-vulnerable-image .
-        
-      - name: Run Snyk to check Docker image for vulnerabilities
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
         with:
-          image: xgrid/test-vulnerable-image
-          args: --file=Dockerfile --severity-threshold=high
+          distribution: 'adopt'
+          java-version: '11'
+
+      - name: Download Dependency-Check CLI
+        run: |
+          curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v9.1.0/dependency-check-9.1.0-release.zip
+          unzip dependency-check.zip
+
+      - name: Run Dependency-Check scan
+        run: |
+          cd dependency-check/bin
+          ./dependency-check.sh --scan $GITHUB_WORKSPACE --nvdApiKey ${{ secrets.NVD_API_KEY }} --out . --format HTML --name Test-Report
+
+      - name: Upload scan report
+        uses: actions/upload-artifact@v2
+        with:
+          name: dependency-check-report
+          path: dependency-check/bin/dependency-check-report.html
