@@ -19,6 +19,13 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
+      - name: Cache NVD data
+        uses: actions/cache@v3
+        id: cache-nvd
+        with:
+          path: ~/.dependency-check/data
+          key: ${{ runner.os }}-dependency-check-${{ hashFiles('**/pom.xml') }}
+
       - name: Download Dependency-Check CLI
         run: |
           curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v9.1.0/dependency-check-9.1.0-release.zip
