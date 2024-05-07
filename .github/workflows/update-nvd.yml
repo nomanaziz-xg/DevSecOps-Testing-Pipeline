@@ -1,6 +1,9 @@
 name: Update Dependency-Check Cache
 
 on:
+  pull_request:
+    branches:
+      - master
   schedule:
     - cron: '0 0 * * 0'  # Run at midnight on Sundays
 
