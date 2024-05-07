@@ -19,16 +19,16 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
+      - name: Download Dependency-Check CLI
+        run: |
+          curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v9.1.0/dependency-check-9.1.0-release.zip
+          unzip dependency-check.zip
+  
       - name: Cache NVD data
         uses: actions/cache@v4
         with:
           path: dependency-check/data
           key: nvd-cache
-
-      - name: Download Dependency-Check CLI
-        run: |
-          curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v9.1.0/dependency-check-9.1.0-release.zip
-          unzip dependency-check.zip
 
       - name: Run Dependency-Check scan
         run: |
