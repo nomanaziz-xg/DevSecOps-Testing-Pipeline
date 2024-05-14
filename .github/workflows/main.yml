@@ -20,15 +20,8 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
+          scan-type: 'image'
           image-ref: 'xg/vuln-app:${{ github.sha }}'
           severity: 'MEDIUM,CRITICAL,HIGH'
           exit-code: '1'
           format: 'table'
-          output: 'trivy-results'
-
-      - name: Upload trivy report as a Github artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-sbom-report
-          path: '${{ github.workspace }}/trivy-results'
-          retention-days: 20 # 90 is the default
