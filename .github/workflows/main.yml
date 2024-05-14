@@ -16,20 +16,19 @@ jobs:
       - name: Build an image from Dockerfile
         run: |
           docker build -t xg/vuln-app:${{ github.sha }} .
-
-      - name: 'Install Trivy'
-        run: |
-          echo "Installing Trivy"
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
       
-      - name: 'Run Trivy Scan'
-        run: |
-          echo "Scanning the Docker image with Trivy"
-          trivy image --severity MEDIUM,HIGH,CRITICAL xg/vuln-app:${{ github.sha }}
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'xg/vuln-app:${{ github.sha }}'
+          severity: 'MEDIUM,CRITICAL,HIGH'
+          exit-code: '1'
+          format: 'table'
+          output: 'trivy-results'
 
       - name: Upload trivy report as a Github artifact
         uses: actions/upload-artifact@v4
         with:
           name: trivy-sbom-report
-          path: '${{ github.workspace }}/dependency-results.sbom.json'
+          path: '${{ github.workspace }}/trivy-results'
           retention-days: 20 # 90 is the default
