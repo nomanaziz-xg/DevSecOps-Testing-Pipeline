@@ -1,0 +1,44 @@
+name: Container Scanning Pipeline
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -t xg/vuln-app:${{ github.sha }} .
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          image-ref: 'xg/vuln-app:${{ github.sha }}'
+          format: 'table'
+          output: 'vulnerabilities-report.txt'
+
+      # It doesn't rescan, uses cache this time
+      - name: Rerun Trivy vulnerability scanner for CI Pipeline
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          image-ref: 'xg/vuln-app:${{ github.sha }}'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          format: 'table'
+
+      - name: Upload trivy report as a Github artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-sbom-report
+          path: '${{ github.workspace }}/vulnerabilities-report.txt'
+          retention-days: 20 # 90 is the default
